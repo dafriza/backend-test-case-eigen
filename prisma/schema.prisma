@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  members   Member[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("users")
+}
+
+model Book {
+  id        Int      @id @default(autoincrement())
+  code      String
+  title     String
+  author    String
+  stock     Int
+  borrows   Borrow[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("books")
+}
+
+model Member {
+  id        Int      @id @default(autoincrement())
+  code      String
+  name      String
+  borrows   Borrow[]
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("members")
+}
+
+model Borrow {
+  id        Int      @id @default(autoincrement())
+  status    Int      @default(1) //"1 => is borrowing, 2 => penalized, 3 => have borrowed"
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    Int
+  member    Member   @relation(fields: [memberId], references: [id])
+  memberId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("borrows")
+}
