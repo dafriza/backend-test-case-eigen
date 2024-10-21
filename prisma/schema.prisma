@@ -18,7 +18,7 @@ model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
   password  String
-  members   Member[]
+  member    Member?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
@@ -42,9 +42,10 @@ model Member {
   id        Int      @id @default(autoincrement())
   code      String
   name      String
+  status    Int      @default(1) //1 => active, 2 => penalized
   borrows   Borrow[]
   user      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  userId    Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
@@ -53,7 +54,7 @@ model Member {
 
 model Borrow {
   id        Int      @id @default(autoincrement())
-  status    Int      @default(1) //"1 => is borrowing, 2 => penalized, 3 => have borrowed"
+  status    Int      @default(1) //"1 => is borrowing
   book      Book     @relation(fields: [bookId], references: [id])
   bookId    Int
   member    Member   @relation(fields: [memberId], references: [id])
